@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Header Tool</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header class="header">
+    <h1>Header Tool</h1>
+    <div class="header-right">
+      <span class="master-label" id="masterLabel">Headers</span>
+      <label class="switch" title="Enable or disable all headers">
+        <input type="checkbox" id="masterToggle" aria-labelledby="masterLabel">
+        <span class="slider" aria-hidden="true"></span>
+      </label>
+    </div>
+  </header>
+
+  <div class="scope-status" id="scopeStatus" role="status" aria-live="polite">
+    <span class="scope-dot" id="scopeDot" aria-hidden="true"></span>
+    <span class="scope-text" id="scopeText">Checking current tab&hellip;</span>
+  </div>
+
+  <div class="section">
+    <div class="profile-bar">
+      <select id="profileSelect" aria-label="Active profile"></select>
+      <div class="profile-btns">
+        <button id="newBtn" class="icon-btn" type="button" title="New profile" aria-label="New profile">+</button>
+        <button id="renameBtn" class="icon-btn" type="button" title="Rename profile" aria-label="Rename profile">Aa</button>
+        <button id="deleteBtn" class="icon-btn" type="button" title="Delete profile" aria-label="Delete profile">&#128465;</button>
+      </div>
+    </div>
+
+    <div id="rows" class="rows" role="list"></div>
+
+    <button id="addBtn" class="btn btn-primary" type="button">+ Add header</button>
+
+    <details class="domains" id="domainsPanel">
+      <summary>Domains <span class="domains-count" id="domainsCount"></span></summary>
+      <p class="domains-hint">Headers are only injected on these domains (and their subdomains). Adding a domain will ask for permission.</p>
+      <div id="domainList" class="domain-list"></div>
+      <form class="domain-add" id="domainAddForm">
+        <input type="text" id="domainInput" placeholder="example.com" aria-label="New domain" spellcheck="false" autocomplete="off">
+        <button class="btn btn-ghost" type="submit">Add</button>
+      </form>
+    </details>
+  </div>
+
+  <div class="footer-actions">
+    <button id="exportBtn" class="btn btn-ghost footer-btn" type="button" aria-label="Export active profile">Export</button>
+    <button id="importBtn" class="btn btn-ghost footer-btn" type="button" aria-label="Import profile from file">Import</button>
+    <button id="themeToggleBtn" class="btn btn-ghost theme-btn" type="button" aria-label="Toggle dark or light theme">
+      <span aria-hidden="true">
+        <svg class="icon icon-sun" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg class="icon icon-moon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+      </span>
+    </button>
+    <input type="file" id="importFile" accept="application/json" hidden>
+  </div>
+
+  <datalist id="headerNames">
+    <option value="debug"></option>
+    <option value="debugVerbose"></option>
+    <option value="cacheDisabled"></option>
+    <option value="traceLevel"></option>
+    <option value="eventLog"></option>
+    <option value="FutureContentEnabled"></option>
+    <option value="OneTrustCookiesConsentNoticeEnabled"></option>
+    <option value="Econfig2Enabled"></option>
+  </datalist>
+
+  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+  <script src="../shared/theme.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
