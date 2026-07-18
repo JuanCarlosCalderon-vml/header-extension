@@ -8,12 +8,6 @@
     "storage",
     "activeTab"
   ],
-  "host_permissions": [
-    "*://*.vml.dev/*",
-    "*://*.acura.com/*",
-    "*://*.autos.honda.com/*",
-    "*://*.automobiles.honda.com/*"
-  ],
   "optional_host_permissions": [
     "*://*/*"
   ],

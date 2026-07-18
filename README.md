@@ -87,8 +87,7 @@ Headers apply **only** to approved domains and their subdomains. Open the
   only. This keeps access explicit and minimal.
 - **Remove** a domain — the corresponding permission is revoked.
 
-The default environments (`vml.dev`, `acura.com`, `autos.honda.com`,
-`automobiles.honda.com`) are seeded on first run.
+The domain list starts empty; add the domains you need on first run.
 
 ### 6. Check scope on the current tab
 
@@ -122,11 +121,10 @@ remembered.
 | `declarativeNetRequest` | Add/modify HTTP request headers (core function). |
 | `storage` | Save header profiles and settings locally. |
 | `activeTab` | Read the current tab URL to show whether headers apply. |
-| `host_permissions` | Apply headers on the pre-approved internal environments. |
 | `optional_host_permissions` (`*://*/*`) | Requested per-domain, only when the user explicitly adds a domain. |
 
-Default approved domains: `vml.dev`, `acura.com`, `autos.honda.com`,
-`automobiles.honda.com`.
+No domains are approved by default — you add the ones you need from the Domains
+panel, and each is granted host permission only at that moment.
 
 ## Project structure
 

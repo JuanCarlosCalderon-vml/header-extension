@@ -10,12 +10,7 @@ const state = {
   domains: []
 };
 
-const DEFAULT_DOMAINS = [
-  "vml.dev",
-  "acura.com",
-  "autos.honda.com",
-  "automobiles.honda.com"
-];
+const DEFAULT_DOMAINS = [];
 
 // RFC 7230 token — valid HTTP header name characters.
 const HEADER_NAME_RE = /^[!#$%&'*+\-.^_`|~0-9A-Za-z]+$/;

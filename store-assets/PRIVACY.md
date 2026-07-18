@@ -25,9 +25,9 @@ party. Uninstalling the extension removes this data.
 - **storage** — used to save the user's header profiles and settings locally.
 - **activeTab** — used to read the current tab's URL only to indicate whether
   headers apply to the page being viewed.
-- **Host permissions** — headers are applied only to the pre-approved
-  environments and to any additional domain the user explicitly adds. Broad
-  host access is requested on a per-domain basis, only when the user opts in.
+- **Host permissions** — headers are applied only to domains the user explicitly
+  adds. Broad host access is requested on a per-domain basis, only when the user
+  opts in.
 
 ## Third parties
 Header Tool does not include any third-party libraries, SDKs, remote code, or

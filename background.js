@@ -4,16 +4,11 @@
 
 const RULE_ID = 1;
 
-// Default domains the header injection is allowed to touch. requestDomains
-// matches the listed domain and any subdomain (covers *.vml.dev, *.acura.com,
-// etc.). Users can add/remove domains from the popup; the active list lives in
-// chrome.storage.local under "domains".
-const DEFAULT_DOMAINS = [
-  "vml.dev",
-  "acura.com",
-  "autos.honda.com",
-  "automobiles.honda.com"
-];
+// Domains the header injection is allowed to touch. requestDomains matches the
+// listed domain and any subdomain. The list is empty by default; users add the
+// domains they need from the popup, and each one is granted host permission at
+// that moment. The active list lives in chrome.storage.local under "domains".
+const DEFAULT_DOMAINS = [];
 
 // RFC 7230 token — only valid HTTP header name characters.
 const HEADER_NAME_RE = /^[!#$%&'*+\-.^_`|~0-9A-Za-z]+$/;
