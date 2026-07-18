@@ -159,6 +159,6 @@ Title-Cased. Header names are case-insensitive per RFC 7230.
 
 No data is collected or transmitted. See the [privacy policy](store-assets/PRIVACY.md).
 
-## License
+---
 
-Internal tool. All rights reserved by the maintainer.
+2026 Juan Carlos Calderón.
