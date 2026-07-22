@@ -36,6 +36,7 @@ const els = {
   domainList: document.getElementById("domainList"),
   domainInput: document.getElementById("domainInput"),
   domainAddForm: document.getElementById("domainAddForm"),
+  addCurrentBtn: document.getElementById("addCurrentBtn"),
   toast: document.getElementById("toast")
 };
 
@@ -250,24 +251,46 @@ function originsFor(domain) {
 function renderDomains() {
   els.domainsCount.textContent = `(${state.domains.length})`;
   els.domainList.innerHTML = "";
-  for (const domain of state.domains) {
-    const item = document.createElement("div");
-    item.className = "domain-item";
+  if (!state.domains.length) {
+    const empty = document.createElement("div");
+    empty.className = "empty";
+    empty.textContent = "No domains yet. Add one to start injecting headers.";
+    els.domainList.appendChild(empty);
+  } else {
+    for (const domain of state.domains) {
+      const item = document.createElement("div");
+      item.className = "domain-item";
 
-    const label = document.createElement("span");
-    label.className = "domain-name";
-    label.textContent = domain;
+      const label = document.createElement("span");
+      label.className = "domain-name";
+      label.textContent = domain;
 
-    const del = document.createElement("button");
-    del.type = "button";
-    del.className = "del";
-    del.textContent = "\u00d7";
-    del.title = "Remove domain";
-    del.setAttribute("aria-label", `Remove domain ${domain}`);
-    del.addEventListener("click", () => removeDomain(domain));
+      const del = document.createElement("button");
+      del.type = "button";
+      del.className = "del";
+      del.textContent = "\u00d7";
+      del.title = "Remove domain";
+      del.setAttribute("aria-label", `Remove domain ${domain}`);
+      del.addEventListener("click", () => removeDomain(domain));
 
-    item.append(label, del);
-    els.domainList.appendChild(item);
+      item.append(label, del);
+      els.domainList.appendChild(item);
+    }
+  }
+  updateAddCurrentBtn();
+}
+
+// Show a one-click shortcut to add the current tab's host when it is not
+// already covered by an approved domain.
+function updateAddCurrentBtn() {
+  const btn = els.addCurrentBtn;
+  if (!btn) return;
+  const host = normalizeDomain(currentTabHost || "");
+  if (host && !hostInScope(currentTabHost)) {
+    btn.textContent = `+ Add current site (${host})`;
+    btn.hidden = false;
+  } else {
+    btn.hidden = true;
   }
 }
 
@@ -530,6 +553,10 @@ function bind() {
     const value = els.domainInput.value;
     els.domainInput.value = "";
     addDomain(value);
+  });
+
+  els.addCurrentBtn.addEventListener("click", () => {
+    if (currentTabHost) addDomain(currentTabHost);
   });
 }
 

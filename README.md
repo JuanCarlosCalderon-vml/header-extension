@@ -85,6 +85,8 @@ Headers apply **only** to approved domains and their subdomains. Open the
 
 - **Add** a domain — Chrome asks you to grant host permission for that domain
   only. This keeps access explicit and minimal.
+- **Add current site** — a one-click shortcut appears when the domain of the
+  tab you're on isn't approved yet.
 - **Remove** a domain — the corresponding permission is revoked.
 
 The domain list starts empty; add the domains you need on first run.

@@ -413,6 +413,17 @@ body {
   line-height: 1.4;
 }
 
+.add-current {
+  width: 100%;
+  margin-bottom: 8px;
+  font-family: 'SF Mono', Menlo, monospace;
+  font-size: 12px;
+}
+
+.add-current[hidden] {
+  display: none;
+}
+
 .domain-list {
   display: flex;
   flex-direction: column;
