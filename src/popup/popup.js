@@ -71,6 +71,27 @@ async function saveDomains() {
   await chrome.storage.local.set({ domains: state.domains });
 }
 
+// Drop any stored domain whose host permission is not actually granted. This
+// happens when the permission prompt is dismissed/denied after the popup has
+// already closed, leaving a domain saved but non-functional.
+async function reconcileDomainPermissions() {
+  if (!state.domains.length) return;
+  const checks = await Promise.all(
+    state.domains.map(async (domain) => {
+      try {
+        return await chrome.permissions.contains({ origins: originsFor(domain) });
+      } catch (e) {
+        return true; // don't remove on unexpected errors
+      }
+    })
+  );
+  const kept = state.domains.filter((_, i) => checks[i]);
+  if (kept.length !== state.domains.length) {
+    state.domains = kept;
+    await saveDomains();
+  }
+}
+
 function renderProfiles() {
   els.profileSelect.innerHTML = "";
   for (const p of state.profiles) {
@@ -250,7 +271,7 @@ function renderDomains() {
   }
 }
 
-async function addDomain(rawInput) {
+function addDomain(rawInput) {
   const domain = normalizeDomain(rawInput);
   if (!domain) {
     showToast("Invalid domain");
@@ -260,23 +281,36 @@ async function addDomain(rawInput) {
     showToast("Domain already added");
     return;
   }
-  // Ask the user to grant host access for the new domain (declarativeNetRequest
-  // only modifies headers on hosts the extension has permission for).
-  let granted = true;
-  try {
-    granted = await chrome.permissions.request({ origins: originsFor(domain) });
-  } catch (e) {
-    granted = false;
-  }
-  if (!granted) {
-    showToast("Permission denied");
-    return;
-  }
+  // Persist the domain immediately, BEFORE requesting permission. Chrome's
+  // permission prompt can close the popup (destroying this context) before the
+  // request resolves, so saving first prevents the domain from being lost.
+  // We intentionally do not await storage here so the permission request stays
+  // within the user gesture.
   state.domains.push(domain);
-  await saveDomains();
+  saveDomains();
   renderDomains();
   renderScope();
-  showToast("Domain added");
+
+  // Ask the user to grant host access (declarativeNetRequest only modifies
+  // headers on hosts the extension has permission for).
+  chrome.permissions
+    .request({ origins: originsFor(domain) })
+    .then((granted) => {
+      if (granted) {
+        showToast("Domain added");
+      } else {
+        // Roll back if the popup is still open and the user declined. If the
+        // popup already closed, init()'s reconciliation removes it on reopen.
+        state.domains = state.domains.filter((d) => d !== domain);
+        saveDomains();
+        renderDomains();
+        renderScope();
+        showToast("Permission denied");
+      }
+    })
+    .catch(() => {
+      /* popup likely closed; domain is saved and reconciled on reopen */
+    });
 }
 
 async function removeDomain(domain) {
@@ -534,6 +568,7 @@ async function init() {
       ? data.activeProfileId
       : state.profiles[0].id;
 
+  await reconcileDomainPermissions();
   await detectTabHost();
 
   render();
