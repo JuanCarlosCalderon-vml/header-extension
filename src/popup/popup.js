@@ -7,7 +7,8 @@ const state = {
   masterEnabled: true,
   profiles: [],
   activeProfileId: null,
-  domains: []
+  domains: [],
+  safeMode: false
 };
 
 const DEFAULT_DOMAINS = [];
@@ -37,6 +38,7 @@ const els = {
   domainInput: document.getElementById("domainInput"),
   domainAddForm: document.getElementById("domainAddForm"),
   addCurrentBtn: document.getElementById("addCurrentBtn"),
+  safeModeToggle: document.getElementById("safeModeToggle"),
   toast: document.getElementById("toast")
 };
 
@@ -70,6 +72,21 @@ async function save() {
 
 async function saveDomains() {
   await chrome.storage.local.set({ domains: state.domains });
+}
+
+async function saveSafeMode() {
+  await chrome.storage.local.set({ safeMode: state.safeMode });
+}
+
+// A host is "local" if it targets the developer's own machine.
+function isLocalHost(host) {
+  if (!host) return false;
+  return (
+    host === "localhost" ||
+    host.endsWith(".localhost") ||
+    /^127\./.test(host) ||
+    host === "::1"
+  );
 }
 
 // Drop any stored domain whose host permission is not actually granted. This
@@ -278,6 +295,11 @@ function renderDomains() {
       del.addEventListener("click", () => removeDomain(domain));
 
       item.append(label, del);
+      // In Safe Mode, non-local domains are inactive (headers won't apply).
+      if (state.safeMode && !isLocalHost(domain)) {
+        item.classList.add("inactive");
+        item.title = "Inactive while Safe Mode is on (localhost only)";
+      }
       els.domainList.appendChild(item);
     }
   }
@@ -383,9 +405,13 @@ function renderScope() {
     els.scopeText.textContent = "No page in scope check";
     return;
   }
-  if (hostInScope(currentTabHost)) {
+  const registered = hostInScope(currentTabHost);
+  if (registered && (!state.safeMode || isLocalHost(currentTabHost))) {
     els.scopeDot.className = "scope-dot on";
     els.scopeText.textContent = `Applies on ${currentTabHost}`;
+  } else if (registered && state.safeMode) {
+    els.scopeDot.className = "scope-dot off";
+    els.scopeText.textContent = `Safe Mode: ${currentTabHost} inactive (localhost only)`;
   } else {
     els.scopeDot.className = "scope-dot off";
     els.scopeText.textContent = `Not in scope: ${currentTabHost}`;
@@ -562,6 +588,14 @@ function bind() {
   els.addCurrentBtn.addEventListener("click", () => {
     if (currentTabHost) addDomain(currentTabHost);
   });
+
+  els.safeModeToggle.addEventListener("change", () => {
+    state.safeMode = els.safeModeToggle.checked;
+    saveSafeMode();
+    renderDomains();
+    renderScope();
+    showToast(state.safeMode ? "Safe Mode on — localhost only" : "Safe Mode off");
+  });
 }
 
 async function init() {
@@ -572,9 +606,11 @@ async function init() {
     "profiles",
     "activeProfileId",
     "domains",
+    "safeMode",
     "headers"
   ]);
   state.masterEnabled = data.masterEnabled !== false;
+  state.safeMode = data.safeMode === true;
   state.profiles = Array.isArray(data.profiles) ? data.profiles : [];
   state.domains =
     Array.isArray(data.domains) && data.domains.length
@@ -602,6 +638,7 @@ async function init() {
   await reconcileDomainPermissions();
   await detectTabHost();
 
+  els.safeModeToggle.checked = state.safeMode;
   render();
   renderDomains();
   renderScope();

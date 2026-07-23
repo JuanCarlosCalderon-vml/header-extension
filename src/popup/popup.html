@@ -39,6 +39,16 @@
 
     <details class="domains" id="domainsPanel">
       <summary>Domains <span class="domains-count" id="domainsCount"></span></summary>
+      <div class="safe-mode-row">
+        <div class="safe-mode-text">
+          <span class="safe-mode-title">Safe Mode</span>
+          <span class="safe-mode-sub">Only inject on localhost</span>
+        </div>
+        <label class="switch switch-panel" title="When on, headers only apply to localhost">
+          <input type="checkbox" id="safeModeToggle" aria-label="Safe Mode (localhost only)">
+          <span class="slider" aria-hidden="true"></span>
+        </label>
+      </div>
       <p class="domains-hint">Headers are only injected on these domains (and their subdomains). Adding a domain will ask for permission.</p>
       <button id="addCurrentBtn" class="btn btn-ghost add-current" type="button" hidden></button>
       <div id="domainList" class="domain-list"></div>

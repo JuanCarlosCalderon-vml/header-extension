@@ -10,6 +10,7 @@ replacement for third-party header modifiers.
 - **Per-header toggles** — enable/disable individual headers without deleting them.
 - **Profiles** — group headers into named profiles and switch between them.
 - **Scoped by domain** — headers apply only to domains you explicitly approve.
+- **Safe Mode** — restrict injection to `localhost` only, for local development.
 - **Import / export** — share header configurations as JSON.
 - **Light / dark theme**, keyboard accessible.
 
@@ -90,6 +91,11 @@ Headers apply **only** to approved domains and their subdomains. Open the
 - **Remove** a domain — the corresponding permission is revoked.
 
 The domain list starts empty; add the domains you need on first run.
+
+**Safe Mode** (toggle in the Domains panel): when on, headers are injected on
+`localhost` only — any other approved domain becomes inactive (shown struck
+through). Useful for local development and as a guardrail. It's **off by
+default**; turn it on to sandbox the extension to your own machine.
 
 ### 6. Check scope on the current tab
 

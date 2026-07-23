@@ -13,6 +13,16 @@ const DEFAULT_DOMAINS = [];
 // RFC 7230 token — only valid HTTP header name characters.
 const HEADER_NAME_RE = /^[!#$%&'*+\-.^_`|~0-9A-Za-z]+$/;
 
+// A host is "local" if it targets the developer's own machine.
+function isLocalHost(host) {
+  return (
+    host === "localhost" ||
+    host.endsWith(".localhost") ||
+    /^127\./.test(host) ||
+    host === "::1"
+  );
+}
+
 const RESOURCE_TYPES = [
   "main_frame",
   "sub_frame",
@@ -29,12 +39,14 @@ async function rebuildRules() {
     masterEnabled = true,
     profiles = [],
     activeProfileId = null,
-    domains = DEFAULT_DOMAINS
+    domains = DEFAULT_DOMAINS,
+    safeMode = false
   } = await chrome.storage.local.get([
     "masterEnabled",
     "profiles",
     "activeProfileId",
-    "domains"
+    "domains",
+    "safeMode"
   ]);
 
   // Remove any dynamic rules we previously created.
@@ -53,9 +65,10 @@ async function rebuildRules() {
       )
     : [];
 
-  const activeDomains = Array.isArray(domains)
+  const activeDomains = (Array.isArray(domains)
     ? domains.filter((d) => typeof d === "string" && d.trim())
-    : [];
+    : []
+  ).filter((d) => !safeMode || isLocalHost(d));
 
   const addRules = [];
   if (activeHeaders.length && activeDomains.length) {
@@ -100,7 +113,8 @@ chrome.storage.onChanged.addListener((changes, area) => {
     (changes.profiles ||
       changes.masterEnabled ||
       changes.activeProfileId ||
-      changes.domains)
+      changes.domains ||
+      changes.safeMode)
   ) {
     rebuildRules();
   }
