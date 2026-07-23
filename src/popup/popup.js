@@ -237,15 +237,19 @@ function normalizeDomain(input) {
   // Strip scheme, path, port and any leading wildcard/dot.
   d = d.replace(/^[a-z]+:\/\//, "").replace(/\/.*$/, "").replace(/:.*$/, "");
   d = d.replace(/^\*?\./, "");
-  // Basic domain shape: labels separated by dots, no invalid characters.
-  if (!/^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/.test(d)) {
+  // Basic host shape: one or more labels separated by dots. A single label is
+  // allowed so local/internal hosts like "localhost" work; IPv4 is accepted too.
+  if (!/^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*$/.test(d)) {
     return "";
   }
   return d;
 }
 
 function originsFor(domain) {
-  return [`*://${domain}/*`, `*://*.${domain}/*`];
+  // Subdomain wildcards are invalid for IP addresses, so only include the
+  // exact-host pattern for those.
+  const isIp = /^\d{1,3}(\.\d{1,3}){3}$/.test(domain);
+  return isIp ? [`*://${domain}/*`] : [`*://${domain}/*`, `*://*.${domain}/*`];
 }
 
 function renderDomains() {
