@@ -148,6 +148,7 @@ src/
     theme.js           Theme load/apply/toggle
 icons/                 16 / 48 / 128 px icons
 store-assets/          Chrome Web Store listing assets (screenshot, privacy policy)
+test/                  Local echo server for manual testing
 ```
 
 ## Verifying headers
@@ -162,6 +163,22 @@ await chrome.storage.local.get(["profiles", "activeProfileId", "domains", "maste
 
 Note: HTTP/2 sends header names lowercase on the wire; DevTools may display them
 Title-Cased. Header names are case-insensitive per RFC 7230.
+
+## Testing locally
+
+A small echo server is included to confirm injected headers actually reach the
+server (DevTools' Network tab is unreliable for this):
+
+```bash
+python3 test/echo-server.py           # serves http://localhost:8099
+python3 test/echo-server.py 7100      # custom port
+```
+
+Then in Header Tool: add the domain `localhost`, add a header (e.g.
+`X-Authorization` = `test-token`), turn the master switch on, and open the
+server URL. The page lists every header it received — your custom header should
+appear (possibly lower-cased). Toggle **Safe Mode** and visit a non-local site
+to confirm the header is not injected there.
 
 ## Privacy
 
